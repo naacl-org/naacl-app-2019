@@ -16,9 +16,19 @@ The first thing to do is to fill out the Basics section under the "Event Content
 
 Sponsors need to be added manually unlike GuideBook where they could be added as a custom list programmatically by using a zip file of images. To add a sponsor, go to the "Sponsor Banner" section under the "Event Content" tab and click on the "Add Sponsor" button. Fill out the information that is asked for in the pop-up and use the same logo that was used for the website. Although Whova has some logos that it offers up for the more famous companies, they might not be consistent or hi-res enough. **IMPORTANT**: make sure to click "No" for the "Show Banner" question since otherwise it would show ad banners while using the app which is quite intrusive. Click "Save" to save the information for this sponsor. Repeat this process for all other sponsors manually.
 
+Sponsors will show up under "Additional Resources" in the app.
+
 ## Floormaps
 
 Whova has a nice interface for adding floormaps. Go to the "Configure App" tab in the Whova EMS and click on "Floormap". Then click on "Set Up Floor Map" which will open a pop-up. You will need to obtain the actual floor maps for the venue from Priscilla which are usually PDF. For each floor, create an image of the floormap from the PDF and upload it. Next, manually add all of the rooms/locations for this floor by clicking on the "Add a Location/Booth Number" button at the bottom. For each location you added, click on the little map pin icon next to its name in the list that and then click on the corresponding location on the appropriate floor map to place a pin there.
+
+"Floormap" will show up under "Additional Resources" in the app.
+
+## Logistics
+
+Although Whova provides an explicit way to provide "Logistics" – the "Logistics" section under the "Event Content" tab in the Whova EMS – an easier way might be to just add a new resource under "Additional Resources" and point it to the "Participants" page on the conference website. Since the NAACL 2019 website is responsive and provides a table of contents, this is a pretty good option and that's what we used. 
+
+If you end up using the explicit Logistics section, you will need to provide HTML content to show under it by clicking on the "Create a new logistic from scratch" option and then clicking on "Add Logistics". If you do end up manually adding various logistics, they will show up under "Additional Resources" -> "Logistics" in the app.
 
 ## Attendees
 
