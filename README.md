@@ -4,7 +4,7 @@ This repsitory contains resources and scripts for the official Whova app for the
 
 # Populating the App
 
-(**Note**: For any questions, [contact](mailto:first initial then last name at gmail dot com) Nitin Madnani, the conference app chair for NAACL 2019.)
+(**Note**: For any questions, [contact](mailto:first_initial_then_last_name_at_gmail_dot_com) Nitin Madnani, the conference app chair for NAACL 2019.)
 
 The following instructions are for the conference app chair who should be an admin on Whova EMS (Event Management System) for the corresponding conference event. The event itself is created by Whova folks (for NAACL 2019, this was Peter Howell from Whova) once the contract is signed and the payment has been made. The app chair is automatically given admin access assuming they are the one who negotiated communicated with Whova. Usually, they are also given admin access to the previous year's event to figure out how things were done the year before, which is quite helpful.
 
