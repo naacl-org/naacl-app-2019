@@ -10,7 +10,18 @@ The following instructions are for the conference app chair who should be an adm
 
 ## Basics
 
-The first thing to do is to fill out the Basics section under the "Event Content" tab of the Whova EMS. This is information like the the conference, name, dates, address of the venue, description, website address, twitter hashtag, etc. Some of this might be pre-populated by the Whova folks.
+The first thing to do is to fill out the Basics section under the "Event Content" tab of the Whova EMS. This includes the following information: 
+- the conference name, 
+- dates
+- address of the venue
+- description
+- welcome message
+- website address
+- twitter hashtag
+- app logo image (see `images/app-logo.png` for NAACL 2019 logo)
+- header image (see `images/header.jpg`)  
+
+Some of this might be pre-populated by the Whova folks.
 
 ## Sponsors
 
