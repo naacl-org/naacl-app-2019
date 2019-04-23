@@ -51,7 +51,7 @@ For most events on Whova, a user needs to not only have a Whova account but that
 2. They must know the secret access code for the event that only the app chair can see on the Whova EMS. 
 3. They request access to the event through the Whova app and their request is explicitly approved by the app chair via the Whova EMS.
 
-For NAACL 2019, we get the list of folks who have registered for the conference from Priscilla and pre-populate the list of attendees by clicking on the "Import Attendees" button. This will provide an Excel template that can be populated using the information from Priscilla and uploaded to Whova.
+For NAACL 2019, we pre-populate the list of attendees by clicking on the "Import Attendees" button. This will provide an Excel template that can be populated using the information from Priscilla and uploaded to Whova. We get the spreadsheet of folks who have registered for the conference from Priscilla and then massage that spreadsheet into this Whova template.
 
 **Notes**: 
 - Some users might use a different email for conference registration and a different one for Whova, so option (3) is also likely to be quite popular among such users. 
