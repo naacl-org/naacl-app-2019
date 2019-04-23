@@ -65,4 +65,4 @@ For NAACL 2019, we pre-populate the list of attendees by clicking on the "Import
 Most of the content in this repository is under the MIT License _except_:
 
 - `images/header.jpg` - Original Photo by Daniel McCullough on Unsplash was uploaded under the [Unsplash License](https://unsplash.com/license).
-- `images/floormaps/*.png` - The floormaps are the property of Hyatt Regency and are extracted from the PDF of the [publicly available floorplans](https://assets.hyatt.com/content/dam/hyatt/hyattdam/documents/2014/12/08/1806/MSPRM_HR_Minneapolis_FP.pdf) on their website.
+- `images/floormaps/*.png` - The floormaps are the property of Hyatt Regency and are extracted from the PDF of the floorplan provided to Priscilla as part of the signed contract. 
