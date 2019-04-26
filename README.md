@@ -31,7 +31,7 @@ Sponsors will show up under "Additional Resources" in the app.
 
 ## Floormaps
 
-Whova has a nice interface for adding floormaps. Go to the "Configure App" tab in the Whova EMS and click on "Floormap". Then click on "Set Up Floor Map" which will open a pop-up. You will need to obtain the actual floor maps for the venue from Priscilla which are usually PDF. For each floor, create an image of the floormap from the PDF and upload it. Next, manually add all of the rooms/locations for this floor by clicking on the "Add a Location/Booth Number" button at the bottom. For each location you added, click on the little map pin icon next to its name in the list that and then click on the corresponding location on the appropriate floor map to place a pin there.
+Whova has a nice interface for adding floormaps. Go to the "Configure App" tab in the Whova EMS and click on "Floormap". Then click on "Set Up Floor Map" which will open a pop-up. You will need to obtain the actual floor maps for the venue from Priscilla which are usually PDF. Create an image (I used a 300dpi PNG) of the floormap from the PDF and upload it in Whova. Next, manually add all of the rooms/locations by clicking on the "Add a Location/Booth Number" button at the bottom. For each location you added, click on the little map pin icon next to its name in the list that and then click on the corresponding location on the floor map to place a pin there.
 
 "Floormap" will show up under "Additional Resources" in the app.
 
