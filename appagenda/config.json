@@ -1,0 +1,19 @@
+{
+    "order_files": {
+        "main": "agenda/data/order/manually_combined_order",
+        "*SEM": "agenda/data/order/sem_order"
+    },
+    "mapping_files": {
+        "main": "agenda/data/mapping/manually_combined_id_map.txt",
+        "*SEM": "agenda/data/mapping/sem_id_map.txt"
+    },
+    "xml_files": [
+        "agenda/data/xml/N19.xml",
+        "agenda/data/xml/S19.xml"
+    ],
+    "extra_metadata_file": "agenda/data/non-anthology-metadata.tsv",
+    "plenary_info_file": "agenda/data/plenary-info.tsv",
+    "attendees_file": "appagenda/2019-NAACL-Registrations-for-App-May20.xlsx",
+    "pdf_links": false,
+    "video_links": false
+}

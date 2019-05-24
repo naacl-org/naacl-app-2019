@@ -21,6 +21,7 @@ Date: May, 2019
 
 import argparse
 import csv
+import json
 import logging
 import sys
 
@@ -36,6 +37,11 @@ sys.path.append(str(AGENDA_SUBMODULE_DIR))
 
 from orderfile import Agenda, SessionGroup, Session, Item
 from metadata import ScheduleMetadata
+
+SESSION_TRACK_DISPLAY_DICT = {'srw': 'SRW',
+                              'tacl': 'TACL',
+                              'demos': 'Demos',
+                              'industry': 'Industry'}
 
 
 def write_rows_in_sheet_at_cell(sheet, cellstr, rows):
@@ -93,6 +99,55 @@ def write_rows_in_sheet_at_cell(sheet, cellstr, rows):
             cell.value = value
 
 
+def get_tracks_for_session(session, event):
+    """
+    Get the semicolon-separated tracks
+    for a given session in a given event
+    to be used in the Whova agenda template.
+
+    Parameters
+    ----------
+    session : AppSession
+        An `AppSession` object for which we want
+        the tracks.
+    event : str
+        The event in which the session is being
+        held.
+
+    Returns
+    -------
+    tracks : str
+        The semicolon-separated string indicating
+        the tracks for this session. For workshops
+        and co-located events, this is a single
+        string with the same value as the event name.
+        For the main conference – with the event value
+        of 'main' – there can be multiple tracks.
+    """
+    # initialize the tracks to be empty string
+    tracks = ''
+
+    # for the main conference, if we have a paper session,
+    # a poster session, or the best paper session, compute
+    # the tracks based on the IDs; Note that "Research" is
+    # always one of the tracks
+    if event == 'main':
+        if session.type in ['paper', 'poster', 'best_paper']:
+            tracks = 'Research'
+            item_tracks = []
+            item_tracks = {item.id_.split('-')[1] for item in session.items if '-' in item.id_}
+            if len(item_tracks) > 0:
+                item_tracks_str = '; '.join([SESSION_TRACK_DISPLAY_DICT[item_track] for item_track in item_tracks])
+                tracks += '; {}'.format(item_tracks_str)
+
+    # for a workshop or a co-located event, we simply use
+    # the name of the event as the only track name
+    else:
+        tracks = event
+
+    return tracks
+
+
 class AppAgenda(Agenda):
     """
     Class encapsulating the agenda for the Whova app.
@@ -103,8 +158,9 @@ class AppAgenda(Agenda):
     imported into the app via the Whova EMS.
     """
 
-    def __init__(self):
+    def __init__(self, event='main'):
         super(AppAgenda, self).__init__()
+        self.event = event
 
     def to_rows(self,
                 metadata,
@@ -160,18 +216,20 @@ class AppAgenda(Agenda):
                 if isinstance(content, SessionGroup):
                     content.__class__ = AppSessionGroup
                     session_group_rows = content.to_rows(day,
+                                                         self.event,
                                                          metadata,
                                                          pdf_links=pdf_links,
                                                          video_links=video_links,
                                                          plenary_info=plenary_info)
                     agenda_rows.extend(session_group_rows)
 
-                # if it's a `Session`, then cast it to `WebSession`
-                # and call its `to_html()` method and save that to
-                # the agenda HTML.
+                # if it's a `Session`, then cast it to `AppSession`
+                # and call its `to_rows()` method and save that to
+                # the agenda rows.
                 elif isinstance(content, Session):
                     content.__class__ = AppSession
                     session_rows = content.to_rows(day,
+                                                   self.event,
                                                    metadata,
                                                    pdf_links=pdf_links,
                                                    video_links=video_links,
@@ -196,6 +254,7 @@ class AppSessionGroup(SessionGroup):
 
     def to_rows(self,
                 day,
+                event,
                 metadata,
                 pdf_links=False,
                 video_links=False,
@@ -258,7 +317,7 @@ class AppSessionGroup(SessionGroup):
             # have a start and end time defined in the
             # order file, so we need to inherit those
             # here since sessions _are_ displayed with
-            # start and end times on the website
+            # start and end times in the app
             if not session.start and not session.end:
                 session.start = self.start
                 session.end = self.end
@@ -266,6 +325,7 @@ class AppSessionGroup(SessionGroup):
             # call the respective `to_rows()` for the session
             # and save the rows
             session_rows = session.to_rows(day,
+                                           event,
                                            metadata,
                                            pdf_links=pdf_links,
                                            video_links=video_links,
@@ -289,6 +349,7 @@ class AppSession(Session):
 
     def to_rows(self,
                 day,
+                event,
                 metadata,
                 pdf_links=False,
                 video_links=False,
@@ -340,48 +401,36 @@ class AppSession(Session):
         # convert the given day to a date string
         date = day.datetime.strftime('%m/%d/%Y')
 
-        # initialize tracks,  description, and authors to be empty
-        tracks = ''
+        # initialize description, and authors to be empty
         description = ''
         authors = ''
 
+        # get the tracks for this session
+        tracks = get_tracks_for_session(self, event)
+
         # for tutorials, we may not have the start
         # and end times defined in the order file but we
-        # need them for the website; if so just get them from
+        # need them for the app; if so just get them from
         # the first session item
         if self.type == 'tutorial':
             if not self.start and not self.end:
                 self.start = self.items[0].start
                 self.end = self.items[0].end
 
-        # the best paper session may not have start
+        # the best paper session in the main conference
+        # or paper sessions in workshops (both not part
+        # of session groups) may not have start
         # and end times defined in the order file but we
-        # need them for the website; if so just get them from
-        # the first and the last item
-        elif self.type == 'best_paper':
+        # need them for the app; if so just get them from
+        # the first and the last item in that session
+        elif self.type in ['paper', 'best_paper']:
             if not self.start and not self.end:
                 self.start = self.items[0].start
                 self.end = self.items[-1].end
-            description = '<p>Chair: {}</p>'.format(self.chair) if self.chair else ''
 
-        # get the values for the columns that are not
-        # session attributes; first the session tracks
-        # are defined by the kinds of items that are in
-        # this paper/poster session. "Research" is always
-        # one of the tracks
-        elif self.type in ['paper', 'poster', 'best_paper']:
-            track_display_dict = {'srw': 'SRW',
-                                  'tacl': 'TACL',
-                                  'demos': 'Demos',
-                                  'industry': 'Industry'}
-            tracks = 'Research'
-            item_tracks = []
-            item_tracks = {item.id_.split('-')[1] for item in self.items if '-' in item.id_}
-            if len(item_tracks) > 0:
-                item_tracks_str = '; '.join([track_display_dict[item_track] for item_track in item_tracks])
-                tracks += '; {}'.format(item_tracks_str)
+            # for these sessions, the description is just
+            # the name of the session chair
             description = '<p>Chair: {}</p>'.format(self.chair) if self.chair else ''
-
         # next use the extra plenary info provided, if appropriate
         elif self.type == 'plenary':
             self.abstract = ''
@@ -445,6 +494,7 @@ class AppSession(Session):
             # call `to_rows()` on each item and save
             # the resulting rows
             generated_rows.append(item.to_rows(day,
+                                               event,
                                                metadata,
                                                pdf_links=pdf_links,
                                                video_links=video_links))
@@ -465,6 +515,7 @@ class AppItem(Item):
 
     def to_rows(self,
                 day,
+                event,
                 metadata,
                 pdf_links=False,
                 video_links=False):
@@ -504,28 +555,36 @@ class AppItem(Item):
         date = day.datetime.strftime('%m/%d/%Y')
 
         # get the metadata for the item
-        self.title = metadata[self.id_].title
-        self.authors = '; '.join(metadata[self.id_].authors)
-        self.pdf_url = metadata[self.id_].pdf_url
-        self.video_url = metadata[self.id_].video_url
+        item_metadata = metadata.lookup(self.id_, event=event)
+        self.title = item_metadata.title
+        self.authors = '; '.join(item_metadata.authors)
+        self.pdf_url = item_metadata.pdf_url
+        self.video_url = item_metadata.video_url
 
         # set the description to be the abstract
-        description = '<p>{}</p>'.format(metadata[self.id_].abstract)
+        description = '<p>{}</p>'.format(item_metadata.abstract)
 
-        # compute the tracks properly which we can get
-        # based on the ID suffix
-        if self.id_.endswith('-srw'):
-            tracks = 'SRW'
-        elif self.id_.endswith('-tacl'):
-            tracks = 'TACL'
-        elif self.id_.endswith('-demos'):
-            tracks = 'Demos'
-        elif self.id_.endswith('-industry'):
-            tracks = 'Industry'
-        elif self.id_.endswith('-tutorial'):
-            tracks = 'Tutorial'
+        # for the main conference, compute the track for the
+        # item which we can get based on the ID suffix; if we
+        # do not have a suffix, the track is simply "Research"
+        if event == 'main':
+            if self.id_.endswith('-srw'):
+                tracks = 'SRW'
+            elif self.id_.endswith('-tacl'):
+                tracks = 'TACL'
+            elif self.id_.endswith('-demos'):
+                tracks = 'Demos'
+            elif self.id_.endswith('-industry'):
+                tracks = 'Industry'
+            elif self.id_.endswith('-tutorial'):
+                tracks = 'Tutorial'
+            else:
+                tracks = 'Research'
+
+        # for all items from workshops or co-located events
+        # the only track is simply the name of the event
         else:
-            tracks = 'Research'
+            tracks = event
 
         # Add paper links and video links if we are asked to
         # and if we have the actual links to add
@@ -554,61 +613,11 @@ def main():
 
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='generate.py')
-    parser.add_argument("--order",
-                        dest="orderfile",
-                        required=True,
-                        help="Manually combined order file")
-    parser.add_argument("--xmls",
-                        dest="xml_files",
-                        required=True,
-                        nargs='+',
-                        type=Path,
-                        help="Anthology XML files containing author "
-                             "and title metadata")
-    parser.add_argument("--mappings",
-                        dest="mapping_files",
-                        required=True,
-                        nargs='+',
-                        type=Path,
-                        help="Files mapping order Anthology IDs "
-                             "to order file IDs.")
-    parser.add_argument("--attendees",
-                        dest="attendee_info",
-                        required=True,
-                        type=Path,
-                        help="Spreadsheet from Priscilla containing "
-                             "information for conference registrants.")
-    parser.add_argument("--extra-metadata",
-                        dest="extra_metadata_file",
-                        required=False,
-                        default=None,
-                        type=Path,
-                        help="TSV file containing authors and "
-                             "titles not in anthology XMLs")
-    parser.add_argument("--plenary-info",
-                        dest="plenary_info_file",
-                        required=False,
-                        default=None,
-                        type=Path,
-                        help="TSV file containing info "
-                             "for plenary sessions")
-    parser.add_argument("--output",
-                        dest="output_file",
-                        required=True,
+    parser.add_argument("config_file",
+                        help="Input JSON file containing "
+                             "the app schedule configuration")
+    parser.add_argument("output_file",
                         help="Output Excel file containing agenda")
-    parser.add_argument("--pdf-links",
-                        action="store_true",
-                        default=False,
-                        dest="pdf_links",
-                        required=False,
-                        help="Generate links to paper and other"
-                             "PDFs where appropriate")
-    parser.add_argument("--video-links",
-                        action="store_true",
-                        default=False,
-                        dest="video_links",
-                        required=False,
-                        help="Generate links to talk videos")
 
     # parse given command line arguments
     args = parser.parse_args()
@@ -616,23 +625,22 @@ def main():
     # set up the logging
     logging.basicConfig(format='%(levelname)s - %(message)s', level=logging.INFO)
 
-    # parse the orderfile into a `WebAgenda` object
-    logging.info('Parsing order file ...')
-    app_agenda = AppAgenda()
-    app_agenda.fromfile(args.orderfile)
+    # parse the configuration file
+    with open(args.config_file, 'r') as configfh:
+        config = json.loads(configfh.read())
 
     # parse the metadata files
     logging.info('Parsing metadata files ...')
-    metadata = ScheduleMetadata.fromfiles(xmls=args.xml_files,
-                                          mappings=args.mapping_files,
-                                          non_anthology_tsv=args.extra_metadata_file)
+    metadata = ScheduleMetadata.fromfiles(xmls=config['xml_files'],
+                                          mappings=config['mapping_files'],
+                                          non_anthology_tsv=config.get('extra_metadata_file', None))
 
     # parse and store any additional plenary session
     # info if provided
     plenary_info_dict = {}
-    if args.plenary_info_file:
+    if 'plenary_info_file' in config:
         logging.info("Parsing plenary info file ...")
-        with open(args.plenary_info_file, 'r') as plenaryfh:
+        with open(config['plenary_info_file'], 'r') as plenaryfh:
             reader = csv.DictReader(plenaryfh, dialect=csv.excel_tab)
             for row in reader:
                 key = row['session'].strip()
@@ -644,18 +652,38 @@ def main():
                          row['video_url'].strip())
                 plenary_info_dict[key] = value
 
-    # convert AppAgenda to rows
-    logging.info("Converting parsed agenda to rows ...")
-    agenda_rows = app_agenda.to_rows(metadata,
-                                     pdf_links=args.pdf_links,
-                                     video_links=args.video_links,
-                                     plenary_info=plenary_info_dict)
+    # parse the given order fiels into `AppAgenda` objects
+    # and convert them to rows for the Whova app
+    logging.info('Parsing order files and converting to rows...')
+    agenda_rows = []
+    for event, orderfile in config['order_files'].items():
+        app_agenda = AppAgenda(event)
+        app_agenda.fromfile(orderfile)
+        rows = app_agenda.to_rows(metadata,
+                                  pdf_links=config.get('pdf_links', False),
+                                  video_links=config.get('video_links', False),
+                                  plenary_info=plenary_info_dict)
+        agenda_rows += rows
+
+    # validate the rows we have generated to make sure that
+    # the fields that are required: date (index 0), start
+    # time(1), end time (2), and session title (4) are present
+    # for ALL rows; if there are some bad rows, save their indices
+    # so that we can show errors later after we save the sheet
+    bad_rows = []
+    for idx, row in enumerate(agenda_rows):
+        required_fields = row[:3] + [row[4]]
+        try:
+            assert all([field != '' for field in required_fields])
+        except AssertionError:
+            bad_rows.append(26 + idx)
 
     # read in the attendee info sheet
     logging.info("Reading in attendee info ...")
-    df_attendees = read_excel(args.attendee_info, usecols=['Professional Name',
-                                                           'Affiliation',
-                                                           'Email'])
+    df_attendees = read_excel(config['attendees_file'],
+                              usecols=['Professional Name',
+                                       'Affiliation',
+                                       'Email'])
 
     # get all of the speakers in the agenda and look up
     # emails and affiliations in the attendee info for
@@ -705,6 +733,12 @@ def main():
 
     # save the modified workbook to the given output file
     workbook.save(args.output_file)
+
+    # show errors if have any missing required fields
+    if len(bad_rows) > 0:
+        logging.error('The following rows in {} are missing '
+                      'required fields: {}'.format(args.output_file,
+                                                   bad_rows))
 
 
 if __name__ == '__main__':
