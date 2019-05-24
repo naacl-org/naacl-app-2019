@@ -23,7 +23,6 @@ import argparse
 import csv
 import logging
 import sys
-import unicodedata
 
 from pathlib import Path
 
@@ -109,7 +108,7 @@ class AppAgenda(Agenda):
 
     def to_rows(self,
                 metadata,
-                paper_links=False,
+                pdf_links=False,
                 video_links=False,
                 plenary_info={}):
         """
@@ -123,9 +122,9 @@ class AppAgenda(Agenda):
             containing the title, authors,
             abstracts, and anthology URLs for
             each item, if applicable.
-        paper_links : bool, optional
+        pdf_links : bool, optional
             Whether to generate the links to the
-            anthology PDFs.
+            anthology and other PDFs where appropriate.
             Defaults to `False`.
         video_links : bool, optional
             Whether to generate the links to
@@ -162,7 +161,7 @@ class AppAgenda(Agenda):
                     content.__class__ = AppSessionGroup
                     session_group_rows = content.to_rows(day,
                                                          metadata,
-                                                         paper_links=paper_links,
+                                                         pdf_links=pdf_links,
                                                          video_links=video_links,
                                                          plenary_info=plenary_info)
                     agenda_rows.extend(session_group_rows)
@@ -174,7 +173,7 @@ class AppAgenda(Agenda):
                     content.__class__ = AppSession
                     session_rows = content.to_rows(day,
                                                    metadata,
-                                                   paper_links=paper_links,
+                                                   pdf_links=pdf_links,
                                                    video_links=video_links,
                                                    plenary_info=plenary_info)
                     agenda_rows.extend(session_rows)
@@ -198,7 +197,7 @@ class AppSessionGroup(SessionGroup):
     def to_rows(self,
                 day,
                 metadata,
-                paper_links=False,
+                pdf_links=False,
                 video_links=False,
                 plenary_info={}):
         """
@@ -218,9 +217,9 @@ class AppSessionGroup(SessionGroup):
         index : int
             An index to be used in the HTML tags
             for the box representing this session group.
-        paper_links : bool, optional
+        pdf_links : bool, optional
             Whether to generate the links to the
-            anthology PDFs.
+            anthology and other PDFs where appropriate.
             Defaults to `False`.
         video_links : bool, optional
             Whether to generate the links
@@ -268,7 +267,7 @@ class AppSessionGroup(SessionGroup):
             # and save the rows
             session_rows = session.to_rows(day,
                                            metadata,
-                                           paper_links=paper_links,
+                                           pdf_links=pdf_links,
                                            video_links=video_links,
                                            plenary_info=plenary_info)
             generated_rows.extend(session_rows)
@@ -291,7 +290,7 @@ class AppSession(Session):
     def to_rows(self,
                 day,
                 metadata,
-                paper_links=False,
+                pdf_links=False,
                 video_links=False,
                 plenary_info={}):
         """
@@ -310,9 +309,9 @@ class AppSession(Session):
             each item, if applicable.
         index : int, optional
             An index to be used in some of the HTML tags.
-        paper_links : bool, optional
-            Whether to generate the links to
-            the anthology PDFs.
+        pdf_links : bool, optional
+            Whether to generate the links to the
+            anthology and other PDFs where appropriate.
             Defaults to `False`.
         video_links : bool, optional
             Whether to generate the links to
@@ -399,10 +398,17 @@ class AppSession(Session):
                      self.pdf_url,
                      self.video_url) = plenary_info[session_prefix]
                     break
-            description = self.abstract
+
+            # initialize the desciption to be the abstract
+            description = '<p>{}</p>'.format(self.abstract)
             authors = self.person
 
-            # TODO: deal with PDF and Video URLs
+            # Add paper links and video links if we are asked to
+            # and if we have the actual links to add
+            if pdf_links and self.pdf_url:
+                description += ' [<a href="{}">PDF</>]'.format(self.pdf_url)
+            if video_links and self.video_url:
+                description += ' [<a href="{}">VIDEO</a>]'.format(self.video_url)
 
         # this is always a 'Session'
         session_or_sub = 'Session'
@@ -440,7 +446,7 @@ class AppSession(Session):
             # the resulting rows
             generated_rows.append(item.to_rows(day,
                                                metadata,
-                                               paper_links=paper_links,
+                                               pdf_links=pdf_links,
                                                video_links=video_links))
 
         return generated_rows
@@ -460,7 +466,7 @@ class AppItem(Item):
     def to_rows(self,
                 day,
                 metadata,
-                paper_links=False,
+                pdf_links=False,
                 video_links=False):
         """
         Convert item to rows for the Whova app
@@ -473,9 +479,9 @@ class AppItem(Item):
             containing the title, authors,
             abstracts, and anthology URLs for
             each item, if applicable.
-        paper_links : bool, optional
-            Whether to generate the links to
-            the anthology PDF.
+        pdf_links : bool, optional
+            Whether to generate the links to the
+            anthology and other PDFs where appropriate.
             Defaults to `False`.
         video_links : bool, optional
             Whether to generate the links to
@@ -500,8 +506,11 @@ class AppItem(Item):
         # get the metadata for the item
         self.title = metadata[self.id_].title
         self.authors = '; '.join(metadata[self.id_].authors)
-        self.paper_url = metadata[self.id_].anthology_url
-        abstract = metadata[self.id_].abstract
+        self.pdf_url = metadata[self.id_].pdf_url
+        self.video_url = metadata[self.id_].video_url
+
+        # set the description to be the abstract
+        description = '<p>{}</p>'.format(metadata[self.id_].abstract)
 
         # compute the tracks properly which we can get
         # based on the ID suffix
@@ -518,7 +527,12 @@ class AppItem(Item):
         else:
             tracks = 'Research'
 
-        # TODO: handle paper links and video links
+        # Add paper links and video links if we are asked to
+        # and if we have the actual links to add
+        if pdf_links and self.pdf_url:
+            description += ' [<a href="{}">PDF</>]'.format(self.pdf_url)
+        if video_links and self.video_url:
+            description += ' [<a href="{}">VIDEO</a>]'.format(self.video_url)
 
         # for everything except tutorials, we have "Sub"
         session_or_sub = 'Session' if self.type == 'tutorial' else 'Sub'
@@ -530,7 +544,7 @@ class AppItem(Item):
                 tracks,
                 self.title,
                 self.location if hasattr(self, 'location') else '',
-                '<p>{}</p>'.format(abstract),
+                description,
                 self.authors,
                 '',
                 session_or_sub]
@@ -582,20 +596,19 @@ def main():
                         dest="output_file",
                         required=True,
                         help="Output Excel file containing agenda")
-    parser.add_argument("--paper-links",
+    parser.add_argument("--pdf-links",
                         action="store_true",
                         default=False,
-                        dest="paper_links",
+                        dest="pdf_links",
                         required=False,
-                        help="Generate links to "
-                             "to anthology PDFs")
+                        help="Generate links to paper and other"
+                             "PDFs where appropriate")
     parser.add_argument("--video-links",
                         action="store_true",
                         default=False,
                         dest="video_links",
                         required=False,
-                        help="Generate links "
-                             "to talk videos")
+                        help="Generate links to talk videos")
 
     # parse given command line arguments
     args = parser.parse_args()
@@ -634,7 +647,7 @@ def main():
     # convert AppAgenda to rows
     logging.info("Converting parsed agenda to rows ...")
     agenda_rows = app_agenda.to_rows(metadata,
-                                     paper_links=args.paper_links,
+                                     pdf_links=args.pdf_links,
                                      video_links=args.video_links,
                                      plenary_info=plenary_info_dict)
 
