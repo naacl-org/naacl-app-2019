@@ -28,8 +28,6 @@ import sys
 from pathlib import Path
 
 from openpyxl import load_workbook
-from openpyxl.utils import get_column_letter, range_boundaries
-from pandas import concat, DataFrame, read_excel
 
 _THIS_DIR = Path(__file__).absolute().parent
 AGENDA_SUBMODULE_DIR = _THIS_DIR.parent.joinpath('agenda', 'code')
@@ -37,115 +35,9 @@ sys.path.append(str(AGENDA_SUBMODULE_DIR))
 
 from orderfile import Agenda, SessionGroup, Session, Item
 from metadata import ScheduleMetadata
-
-SESSION_TRACK_DISPLAY_DICT = {'srw': 'SRW',
-                              'tacl': 'TACL',
-                              'demos': 'Demos',
-                              'industry': 'Industry'}
-
-
-def write_rows_in_sheet_at_cell(sheet, cellstr, rows):
-    """
-    Write the given rows to the current sheet
-    starting at the given cell. It is assumed
-    that rows is is a list of lists with each
-    child list being the same length.
-
-    Note that nothing is returned since the `sheet`
-    object is modified directly.
-
-    Parameters
-    ----------
-    sheet :  openpyxl.worksheet.worksheet.Worksheet
-        openpyxl Worksheet instance in which to
-        write the given rows.
-    cellstr : str
-        Alphanumeric cell location in an Excel
-        spreadsheet, e.g., 'A26'. The first element
-        of the first list in `rows` is written at
-        this location.
-    rows : list of lists
-        A list of lists with each list containing
-        the same number of strings.
-    """
-
-    # figure out how many rows we are writing first
-    num_rows_to_add = len(rows)
-
-    # get the Cell object corresponding to the given
-    # cell string
-    starting_cell = sheet[cellstr]
-
-    # compute the ending row index in the spreadsheet
-    ending_row_index = starting_cell.row + num_rows_to_add - 1
-
-    # compute the new column letter in the spreadsheet
-    new_column_letter = get_column_letter(starting_cell.column + len(rows[0]) - 1)
-
-    # get the cell range that we will be modifying
-    cell_range = '{}:{}{}'.format(cellstr, new_column_letter, ending_row_index)
-
-    # get the min and max rows and columns which openpyxl needs to
-    # iterate over the rows
-    (min_col, min_row, max_col, max_row) = range_boundaries(cell_range)
-
-    # iterate over each spreadsheet row and write each data row
-    # to the cells in the spreadsheet row
-    for idx, sheet_row in enumerate(sheet.iter_rows(min_col=min_col,
-                                                    max_col=max_col,
-                                                    min_row=min_row,
-                                                    max_row=max_row)):
-        for cell, value in zip(sheet_row, rows[idx]):
-            cell.value = value
-
-
-def get_tracks_for_session(session, event):
-    """
-    Get the semicolon-separated tracks
-    for a given session in a given event
-    to be used in the Whova agenda template.
-
-    Parameters
-    ----------
-    session : AppSession
-        An `AppSession` object for which we want
-        the tracks.
-    event : str
-        The event in which the session is being
-        held.
-
-    Returns
-    -------
-    tracks : str
-        The semicolon-separated string indicating
-        the tracks for this session. For workshops
-        and co-located events, this is a single
-        string with the same value as the event name.
-        For the main conference – with the event value
-        of 'main' – there can be multiple tracks.
-    """
-    # initialize the tracks to be empty string
-    tracks = ''
-
-    # for the main conference, if we have a paper session,
-    # a poster session, or the best paper session, compute
-    # the tracks based on the IDs; Note that "Research" is
-    # always one of the tracks
-    if event == 'main':
-        if session.type in ['paper', 'poster', 'best_paper']:
-            tracks = 'Research'
-            item_tracks = []
-            item_tracks = {item.id_.split('-')[1] for item in session.items if '-' in item.id_}
-            if len(item_tracks) > 0:
-                item_tracks_str = '; '.join([SESSION_TRACK_DISPLAY_DICT[item_track] for item_track in item_tracks])
-                tracks += '; {}'.format(item_tracks_str)
-
-    # for a workshop or a co-located event, we simply use
-    # the name of the event as the only track name
-    else:
-        tracks = event
-
-    return tracks
+from utils import (get_tracks_for_session,
+                   match_speakers_with_attendees,
+                   write_rows_in_sheet_at_cell)
 
 
 class AppAgenda(Agenda):
@@ -158,9 +50,8 @@ class AppAgenda(Agenda):
     imported into the app via the Whova EMS.
     """
 
-    def __init__(self, event='main'):
-        super(AppAgenda, self).__init__()
-        self.event = event
+    def __init__(self, *args):
+        super(AppAgenda, self).__init__(*args)
 
     def to_rows(self,
                 metadata,
@@ -238,6 +129,39 @@ class AppAgenda(Agenda):
 
         # convert the list to a string and return
         return agenda_rows
+
+    @classmethod
+    def validate_rows(cls, rows):
+        """
+        A class method to validate that the given rows
+        contain the fields that are required by the
+        Whova template. The required fields are : date
+        (index 0), start time(1), end time (2), and session
+        title (4) are present for ALL rows; if there are
+        some bad rows, save their indices so that we can
+        show errors later after we save the sheet.
+
+        Parameters
+        ----------
+        rows : list of lists
+            A list of lists, each containing the
+            string-valued fields for each row
+
+        Returns
+        -------
+        invalid_rows : list of lists
+            The subset of the given rows that
+            do not contain the required fields.
+        """
+        invalid_rows = []
+        for idx, row in enumerate(rows):
+            required_fields = row[:3] + [row[4]]
+            try:
+                assert all([field != '' for field in required_fields])
+            except AssertionError:
+                invalid_rows.append(26 + idx)
+
+        return invalid_rows
 
 
 class AppSessionGroup(SessionGroup):
@@ -665,58 +589,15 @@ def main():
                                   plenary_info=plenary_info_dict)
         agenda_rows += rows
 
-    # validate the rows we have generated to make sure that
-    # the fields that are required: date (index 0), start
-    # time(1), end time (2), and session title (4) are present
-    # for ALL rows; if there are some bad rows, save their indices
-    # so that we can show errors later after we save the sheet
-    bad_rows = []
-    for idx, row in enumerate(agenda_rows):
-        required_fields = row[:3] + [row[4]]
-        try:
-            assert all([field != '' for field in required_fields])
-        except AssertionError:
-            bad_rows.append(26 + idx)
+    # validate the rows and get the indices for the rows
+    # that do not contain the required fields
+    invalid_rows = AppAgenda.validate_rows(agenda_rows)
 
-    # read in the attendee info sheet
-    logging.info("Reading in attendee info ...")
-    df_attendees = read_excel(config['attendees_file'],
-                              usecols=['Professional Name',
-                                       'Affiliation',
-                                       'Email'])
-
-    # get all of the speakers in the agenda and look up
-    # emails and affiliations in the attendee info for
-    # names that are exact matches
-    speakers = set()
-    for row in agenda_rows:
-        speaker_string = row[-3]
-        speakers.update(speaker_string.split('; '))
-    df_matched_speakers = df_attendees[df_attendees['Professional Name'].isin(speakers)]
-    df_matched_speakers = df_matched_speakers[['Professional Name',
-                                               'Email',
-                                               'Affiliation']]
-
-    # for those speakers who are not registered, just add their name
-    missing_speaker_dicts = []
-    for missing_speaker_name in speakers.difference(df_matched_speakers['Professional Name']):
-        missing_speaker_dict = {'Professional Name': missing_speaker_name,
-                                'Email': '',
-                                'Affiliation': ''}
-        missing_speaker_dicts.append(missing_speaker_dict)
-
-    df_unmatched_speakers = DataFrame(missing_speaker_dicts)
-    df_unmatched_speakers = df_unmatched_speakers[['Professional Name',
-                                                   'Email',
-                                                   'Affiliation']]
-    # merge the two data frames
-    df_speakers = concat([df_matched_speakers,
-                          df_unmatched_speakers]).reset_index(drop=True)
-
-    # drop any speakers that have the same name and email
-    # since Whova does not like duplicates
-    df_speakers.drop_duplicates(subset=['Professional Name', 'Email'],
-                                inplace=True)
+    # match the speakers in the agenda in the attendees
+    # sheet and look up their metadata
+    logging.info("Matching agenda speakers ...")
+    df_speakers = match_speakers_with_attendees(agenda_rows,
+                                                config['attendees_file'])
 
     # read in the Whova agenda template
     logging.info('Populating Whova template ...')
@@ -735,10 +616,10 @@ def main():
     workbook.save(args.output_file)
 
     # show errors if have any missing required fields
-    if len(bad_rows) > 0:
+    if len(invalid_rows) > 0:
         logging.error('The following rows in {} are missing '
                       'required fields: {}'.format(args.output_file,
-                                                   bad_rows))
+                                                   invalid_rows))
 
 
 if __name__ == '__main__':
