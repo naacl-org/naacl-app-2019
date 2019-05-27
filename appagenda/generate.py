@@ -490,7 +490,8 @@ class AppItem(Item):
 
         # for the main conference, compute the track for the
         # item which we can get based on the ID suffix; if we
-        # do not have a suffix, the track is simply "Research"
+        # do not have a suffix, the track is simply "Main"
+        # which refers to the main conference
         if event == 'main':
             if self.id_.endswith('-srw'):
                 tracks = 'SRW'
@@ -503,7 +504,7 @@ class AppItem(Item):
             elif self.id_.endswith('-tutorial'):
                 tracks = 'Tutorial'
             else:
-                tracks = 'Research'
+                tracks = 'Main'
 
         # for all items from workshops or co-located events
         # the only track is simply the name of the event

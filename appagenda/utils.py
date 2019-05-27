@@ -110,12 +110,15 @@ def get_tracks_for_session(session, event):
     # always one of the tracks
     if event == 'main':
         if session.type in ['paper', 'poster', 'best_paper']:
-            tracks = 'Research'
-            item_tracks = []
-            item_tracks = {item.id_.split('-')[1] for item in session.items if '-' in item.id_}
-            if len(item_tracks) > 0:
-                item_tracks_str = '; '.join([SESSION_TRACK_DISPLAY_DICT[item_track] for item_track in item_tracks])
-                tracks += '; {}'.format(item_tracks_str)
+            session_tracks = set()
+            for item in session.items:
+                try:
+                    item_track = item.id_.split('-')[1]
+                except IndexError:
+                    session_tracks.add('Main')
+                else:
+                    session_tracks.add(SESSION_TRACK_DISPLAY_DICT[item_track])
+                tracks = '; '.join(session_tracks)
 
     # for a workshop or a co-located event, we simply use
     # the name of the event as the only track name
