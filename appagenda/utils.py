@@ -122,8 +122,7 @@ def get_tracks_for_session(session, event):
     return tracks
 
 
-def match_speakers_with_attendees(agenda_rows,
-                                  attendees_file):
+def classify_attendees(agenda_rows, attendees_file):
 
     # read in the attendees file into a data frame
     df_attendees = read_excel(attendees_file,
@@ -156,6 +155,9 @@ def match_speakers_with_attendees(agenda_rows,
                                                    'Email',
                                                    'Affiliation']]
 
+    # we also want the info for those attendees who are not speakers
+    df_non_speaker_attendees = df_attendees[~df_attendees['Professional Name'].isin(speakers)].copy()
+
     # merge the two data frames and drop the index
     df_speakers = concat([df_matched_speakers,
                           df_unmatched_speakers]).reset_index(drop=True)
@@ -165,4 +167,4 @@ def match_speakers_with_attendees(agenda_rows,
     df_speakers.drop_duplicates(subset=['Professional Name', 'Email'],
                                 inplace=True)
 
-    return df_speakers
+    return df_speakers, df_non_speaker_attendees

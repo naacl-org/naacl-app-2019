@@ -35,8 +35,8 @@ sys.path.append(str(AGENDA_SUBMODULE_DIR))
 
 from orderfile import Agenda, SessionGroup, Session, Item
 from metadata import ScheduleMetadata
-from utils import (get_tracks_for_session,
-                   match_speakers_with_attendees,
+from utils import (classify_attendees,
+                   get_tracks_for_session,
                    write_rows_in_sheet_at_cell)
 
 
@@ -540,8 +540,10 @@ def main():
     parser.add_argument("config_file",
                         help="Input JSON file containing "
                              "the app schedule configuration")
-    parser.add_argument("output_file",
-                        help="Output Excel file containing agenda")
+    parser.add_argument("output_agenda_file",
+                        help="Output Excel file containing the app agenda")
+    parser.add_argument("output_attendee_file",
+                        help="Output Excel file containing non-speaker attendees")
 
     # parse given command line arguments
     args = parser.parse_args()
@@ -555,9 +557,10 @@ def main():
 
     # parse the metadata files
     logging.info('Parsing metadata files ...')
+    extra_metadata_files = config.get('extra_metadata_files', {})
     metadata = ScheduleMetadata.fromfiles(xmls=config['xml_files'],
                                           mappings=config['mapping_files'],
-                                          non_anthology_tsv=config.get('extra_metadata_file', None))
+                                          extra_metadata_files=extra_metadata_files)
 
     # parse and store any additional plenary session
     # info if provided
@@ -589,18 +592,42 @@ def main():
                                   plenary_info=plenary_info_dict)
         agenda_rows += rows
 
+    # we need to manually add in the rows for the lunch and coffee
+    # break sessions on June 6th and 7th; we removed them
+    # from the workshop order files since it was leading to
+    # Whova complain about duplicate rows
+    agenda_rows.append(['06/06/2019', '10:30', '11:00', '',
+                        'Morning coffee break', 'Hyatt Exhibit Hall',
+                        '', '', '', 'Session'])
+    agenda_rows.append(['06/06/2019', '12:30', '14:00', '',
+                        'Lunch on your own', '',
+                        '', '', '', 'Session'])
+    agenda_rows.append(['06/06/2019', '15:30', '16:00', '',
+                        'Afternoon coffee break', 'Hyatt Exhibit Hall',
+                        '', '', '', 'Session'])
+    agenda_rows.append(['06/07/2019', '10:30', '11:00', '',
+                        'Morning coffee break', 'Hyatt Exhibit Hall',
+                        '', '', '', 'Session'])
+    agenda_rows.append(['06/07/2019', '12:30', '14:00', '',
+                        'Lunch on your own', '',
+                        '', '', '', 'Session'])
+    agenda_rows.append(['06/07/2019', '15:30', '16:00', '',
+                        'Afternoon coffee break', 'Hyatt Exhibit Hall',
+                        '', '', '', 'Session'])
+
     # validate the rows and get the indices for the rows
     # that do not contain the required fields
+    logging.info("Validating rows ...")
     invalid_rows = AppAgenda.validate_rows(agenda_rows)
 
     # match the speakers in the agenda in the attendees
     # sheet and look up their metadata
-    logging.info("Matching agenda speakers ...")
-    df_speakers = match_speakers_with_attendees(agenda_rows,
-                                                config['attendees_file'])
+    logging.info("Classifying attendees into speakers and non-speakers ...")
+    df_speakers, df_non_speakers = classify_attendees(agenda_rows,
+                                                      config['attendees_file'])
 
     # read in the Whova agenda template
-    logging.info('Populating Whova template ...')
+    logging.info('Populating Whova agenda template ...')
     workbook = load_workbook(str(_THIS_DIR / "Agenda_Track_Template.xlsx"))
 
     # write out the rows in "Agenda" sheet of the template
@@ -620,6 +647,15 @@ def main():
         logging.error('The following rows in {} are missing '
                       'required fields: {}'.format(args.output_file,
                                                    invalid_rows))
+
+    # now write out the non-speaker attendees file
+    logging.info('Populating Whova attendee template with non-speakers ...')
+    workbook = load_workbook(str(_THIS_DIR / "Attendee_list_template.xlsx"))
+    sheet = workbook['Sheet1']
+    attendee_rows = df_non_speakers[['Professional Name', 'Email', 'Affiliation']].to_numpy().tolist()
+    attendee_rows = [['', ''] + row + ['', '', '', ''] for row in attendee_rows]
+    write_rows_in_sheet_at_cell(sheet, 'A11', attendee_rows)
+    workbook.save(args.output_attendee_file)
 
 
 if __name__ == '__main__':
