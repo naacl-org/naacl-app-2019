@@ -1,17 +1,61 @@
 {
     "order_files": {
         "main": "agenda/data/order/manually_combined_order",
-        "*SEM": "agenda/data/order/sem_order"
+        "*SEM": "agenda/data/order/sem_order",
+        "SemEval": "agenda/data/order/SemEval_order",
+        "CLPsych": "agenda/data/order/clpsych_order",
+        "DISRPT": "agenda/data/order/disrpt_order",
+        "ESSP": "agenda/data/order/essp_order",
+        "NeuralGen": "agenda/data/order/neuralgen_order",
+        "NLP+CSS": "agenda/data/order/nlpcss_order",
+        "RepEval": "agenda/data/order/repeval_order",
+        "SiVL": "agenda/data/order/sivl_order",
+        "SpLU-RoboNLP": "agenda/data/order/splu_order",
+        "WASSA": "agenda/data/order/wassa_order",
+        "ClinicalNLP": "agenda/data/order/clinicalnlp_order",
+        "CMCL": "agenda/data/order/cmcl_order",
+        "CRAC": "agenda/data/order/crac2019_order",
+        "LaTECH-ClFl": "agenda/data/order/latechclfl_order",
+        "WNU": "agenda/data/order/wnu_order",
+        "NLLP": "agenda/data/order/nllp_order",
+        "SLPAT": "agenda/data/order/slpat_order",
+        "SPNLP": "agenda/data/order/spnlp_order",
+        "VarDial": "agenda/data/order/vardial_order"
     },
     "mapping_files": {
         "main": "agenda/data/mapping/manually_combined_id_map.txt",
-        "*SEM": "agenda/data/mapping/sem_id_map.txt"
+        "*SEM": "agenda/data/mapping/sem_id_map.txt",
+        "SemEval": "agenda/data/mapping/SemEval_id_map.txt",
+        "CLPsych": "agenda/data/mapping/clpsych_id_map.txt",
+        "DISRPT": "agenda/data/mapping/disrpt_id_map.txt",
+        "ESSP": "agenda/data/mapping/essp_id_map.txt",
+        "NeuralGen": "agenda/data/mapping/neuralgen_id_map.txt",
+        "NLP+CSS": "agenda/data/mapping/nlpcss_id_map.txt",
+        "RepEval": "agenda/data/mapping/repeval_id_map.txt",
+        "SiVL": "agenda/data/mapping/sivl_id_map.txt",
+        "SpLU-RoboNLP": "agenda/data/mapping/splu_id_map.txt",
+        "WASSA": "agenda/data/mapping/wassa_id_map.txt",
+        "ClinicalNLP": "agenda/data/mapping/clinicalnlp_id_map.txt",
+        "CMCL": "agenda/data/mapping/cmcl_id_map.txt",
+        "CRAC": "agenda/data/mapping/crac2019_id_map.txt",
+        "LaTECH-ClFl": "agenda/data/mapping/latechclfl_id_map.txt",
+        "WNU": "agenda/data/mapping/wnu_id_map.txt",
+        "NLLP": "agenda/data/mapping/nllp_id_map.txt",
+        "SLPAT": "agenda/data/mapping/slpat_id_map.txt",
+        "SPNLP": "agenda/data/mapping/spnlp_id_map.txt",
+        "VarDial": "agenda/data/mapping/vardial_id_map.txt"
+    },
+    "extra_metadata_files": {
+        "main": "agenda/data/extra-metadata/main.tsv",
+        "NeuralGen": "agenda/data/extra-metadata/neuralgen.tsv",
+        "NLLP": "agenda/data/extra-metadata/nllp.tsv",
+        "WNU": "agenda/data/extra-metadata/wnu.tsv"
     },
     "xml_files": [
         "agenda/data/xml/N19.xml",
-        "agenda/data/xml/S19.xml"
+        "agenda/data/xml/S19.xml",
+        "agenda/data/xml/W19.xml"
     ],
-    "extra_metadata_file": "agenda/data/non-anthology-metadata.tsv",
     "plenary_info_file": "agenda/data/plenary-info.tsv",
     "attendees_file": "appagenda/2019-NAACL-Registrations-for-App-May20.xlsx",
     "pdf_links": false,
