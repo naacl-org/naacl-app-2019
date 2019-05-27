@@ -62,7 +62,7 @@ Note that the massaging referred to above is done by the agenda generation scrip
 
 ## Schedule
 
-See this [README](appagenda/README.md).
+The code and data for this lives under `appagenda`. For more details, refer to that [README](appagenda/README.md).
 
 # License
 
