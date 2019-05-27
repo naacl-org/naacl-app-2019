@@ -640,7 +640,7 @@ def main():
     write_rows_in_sheet_at_cell(sheet, 'A6', df_speakers.to_numpy().tolist())
 
     # save the modified workbook to the given output file
-    workbook.save(args.output_file)
+    workbook.save(args.output_agenda_file)
 
     # show errors if have any missing required fields
     if len(invalid_rows) > 0:
