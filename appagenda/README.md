@@ -135,4 +135,5 @@ Note that the two output files are _not_ checked into the repository since it co
 Note that the Excel files produced by `generate.py` usually require some manual tweaking before they can be uploaded into the Whova EMS. Here are some known tweaks:
 
 1. The "Speakers" column (column H) in the "Agenda" sheet of the agenda Excel file need to be cleared of formatting before uploading. On macOS, this is done by selecting all of the cells in column H and then choose `Edit` -> `Clear` -> `Formats`.
+
 2. The "Email" columns in the agenda and attendees Excel files (column E in the "Speaker" sheet for the agenda file; column D in the attendees file) might contain invalid emails or might need to be cleared of formatting.
