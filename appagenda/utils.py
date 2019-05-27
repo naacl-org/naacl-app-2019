@@ -46,31 +46,34 @@ def write_rows_in_sheet_at_cell(sheet, cellstr, rows):
     # figure out how many rows we are writing first
     num_rows_to_add = len(rows)
 
-    # get the Cell object corresponding to the given
-    # cell string
-    starting_cell = sheet[cellstr]
+    # if there are any rows to add
+    if num_rows_to_add > 0:
 
-    # compute the ending row index in the spreadsheet
-    ending_row_index = starting_cell.row + num_rows_to_add - 1
+        # get the Cell object corresponding to the given
+        # cell string
+        starting_cell = sheet[cellstr]
 
-    # compute the new column letter in the spreadsheet
-    new_column_letter = get_column_letter(starting_cell.column + len(rows[0]) - 1)
+        # compute the ending row index in the spreadsheet
+        ending_row_index = starting_cell.row + num_rows_to_add - 1
 
-    # get the cell range that we will be modifying
-    cell_range = '{}:{}{}'.format(cellstr, new_column_letter, ending_row_index)
+        # compute the new column letter in the spreadsheet
+        new_column_letter = get_column_letter(starting_cell.column + len(rows[0]) - 1)
 
-    # get the min and max rows and columns which openpyxl needs to
-    # iterate over the rows
-    (min_col, min_row, max_col, max_row) = range_boundaries(cell_range)
+        # get the cell range that we will be modifying
+        cell_range = '{}:{}{}'.format(cellstr, new_column_letter, ending_row_index)
 
-    # iterate over each spreadsheet row and write each data row
-    # to the cells in the spreadsheet row
-    for idx, sheet_row in enumerate(sheet.iter_rows(min_col=min_col,
-                                                    max_col=max_col,
-                                                    min_row=min_row,
-                                                    max_row=max_row)):
-        for cell, value in zip(sheet_row, rows[idx]):
-            cell.value = value
+        # get the min and max rows and columns which openpyxl needs to
+        # iterate over the rows
+        (min_col, min_row, max_col, max_row) = range_boundaries(cell_range)
+
+        # iterate over each spreadsheet row and write each data row
+        # to the cells in the spreadsheet row
+        for idx, sheet_row in enumerate(sheet.iter_rows(min_col=min_col,
+                                                        max_col=max_col,
+                                                        min_row=min_row,
+                                                        max_row=max_row)):
+            for cell, value in zip(sheet_row, rows[idx]):
+                cell.value = value
 
 
 def get_tracks_for_session(session, event):
