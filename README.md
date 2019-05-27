@@ -58,7 +58,11 @@ For NAACL 2019, we pre-populate the list of attendees by clicking on the "Import
 - Option (2) is not very secure since users might make that access code public or share with other attendees who aren't registered for the conference. 
 - The app chair might also need to add an attendee manually by clicking on the "Add Attendee" button in certain situations where it's just easier to add one or two records manually rather than uploading a whole spreadsheet again.
 
+Note that the massaging referred to above is done by the agenda generation script [`generate.py`](appagenda/generate.py). For more on this, refer to the next section.
+
 ## Schedule
+
+See this [README](appagenda/README.md).
 
 # License
 
