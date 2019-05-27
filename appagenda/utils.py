@@ -122,43 +122,84 @@ def get_tracks_for_session(session, event):
     return tracks
 
 
-def classify_attendees(agenda_rows, attendees_file):
+def classify_attendees(agenda_rows, attendees_file=None):
+    """
+    Given the rows containing agenda information, including
+    speakers, and an optional file containing information
+    about registered attendees, return two data frames:
+    one containing information about speakers (whether or not
+    they are registered) and the second containing information
+    about registered attendees who are not speakers. The
+    columns in both files are as follows: "Professional Name", "
+    Email", and "Affiliation". However, note that for unregistered
+    speakers, only the "Professional Name" field is populated
+    as the other information is provided by the attendees file.
 
-    # read in the attendees file into a data frame
-    df_attendees = read_excel(attendees_file,
-                              usecols=['Professional Name',
-                                       'Affiliation',
-                                       'Email'])
+    Parameters
+    ----------
+    agenda_rows : list of lists
+        A list of rows containing the fields for the App agenda.
+    attendees_file : str, optional
+        Path to the optional attendees file containing information
+        for conference registrants.
 
-    # get all of the speakers in the agenda and look up
-    # emails and affiliations in the attendee info for
-    # names that are exact matches
+    Returns
+    -------
+    (df_speakers, df_non_speaker_attendees) : tuple
+        Tuple containing two data frames : the first
+        containing information about speakers - whether
+        registered or unregistered - and the second
+        containing information about folk who are
+        not speakers but are still registered for
+        the conference.
+    """
+    # first get all of the speakers in the agenda
     speakers = set()
     for row in agenda_rows:
         speaker_string = row[-3]
         speakers.update(speaker_string.split('; '))
-    df_matched_speakers = df_attendees[df_attendees['Professional Name'].isin(speakers)]
-    df_matched_speakers = df_matched_speakers[['Professional Name',
-                                               'Email',
-                                               'Affiliation']]
 
-    # for those speakers who are not registered, just add their name
+    # if we are given an attendees file then
+    # read that file into a data frame
+    if attendees_file:
+        df_attendees = read_excel(attendees_file,
+                                  usecols=['Professional Name',
+                                           'Affiliation',
+                                           'Email'])
+
+        # and then look up the emails and affiliations for the
+        # speakers in the attendee info based on exact matches
+        df_matched_speakers = df_attendees[df_attendees['Professional Name'].isin(speakers)]
+        df_matched_speakers = df_matched_speakers[['Professional Name',
+                                                   'Email',
+                                                   'Affiliation']]
+        # we also want the info for those attendees who are not speakers
+        df_non_speaker_attendees = df_attendees[~df_attendees['Professional Name'].isin(speakers)].copy()
+
+    # if no attendees file was provided, then we have no matching speakers
+    # and no non-speaker attendees either.
+    else:
+        df_matched_speakers = DataFrame(columns=['Professional Name',
+                                                 'Email',
+                                                 'Affiliation'])
+        df_non_speaker_attendees = DataFrame(columns=['Professional Name',
+                                                      'Email',
+                                                      'Affiliation'])
+
+    # for those speakers who are not registered as attendees
+    # just add their name and order the columns correctly
     missing_speaker_dicts = []
     for missing_speaker_name in speakers.difference(df_matched_speakers['Professional Name']):
         missing_speaker_dict = {'Professional Name': missing_speaker_name,
                                 'Email': '',
                                 'Affiliation': ''}
         missing_speaker_dicts.append(missing_speaker_dict)
-
     df_unmatched_speakers = DataFrame(missing_speaker_dicts)
     df_unmatched_speakers = df_unmatched_speakers[['Professional Name',
                                                    'Email',
                                                    'Affiliation']]
 
-    # we also want the info for those attendees who are not speakers
-    df_non_speaker_attendees = df_attendees[~df_attendees['Professional Name'].isin(speakers)].copy()
-
-    # merge the two data frames and drop the index
+    # merge the matched and unmatched speaker data frames and drop the index
     df_speakers = concat([df_matched_speakers,
                           df_unmatched_speakers]).reset_index(drop=True)
 
@@ -167,4 +208,5 @@ def classify_attendees(agenda_rows, attendees_file):
     df_speakers.drop_duplicates(subset=['Professional Name', 'Email'],
                                 inplace=True)
 
+    # return the two data frames
     return df_speakers, df_non_speaker_attendees
