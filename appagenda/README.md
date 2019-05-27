@@ -48,7 +48,7 @@ As output, `generate.py` produces two files:
     
     1. The first is an Excel files containing the detailed agenda and speakers for NAACL 2019 - across the main conference and all workshops. This Excel file contains two main sheets called "Agenda" and "Speaker". The "Agenda" sheet contains the schedule information including dates, start times, end times, session titles, abstracts, names of authors/speakers etc. The "Speaker" sheet contains the names, emails, and affiliations of all of the people who are authors and co-authors on any papers across the main conference and workshops. 
    
-    2. The second output file is also an Excel file and contains names, emails, and affiliations for non-speaker attendees. That is, folks who are registered for the conference but aren't authors or co-authors on any papers. 
+    2. The second output file is also an Excel file and contains names, emails, and affiliations for non-speaker attendees in a single sheet called "Sheet1". That is, folks who are registered for the conference but aren't authors or co-authors on any papers. 
 
 The script `generate.py` also relies on some utility functions that are defined in `utils.py`. For more details on these two scripts, please refer to the code and the comments in the scripts.
 
@@ -131,3 +131,8 @@ The configuration file `config.json` is checked into the repository and looks li
 Note that the two output files are _not_ checked into the repository since it contains personal information for conference attendees. You will also need to get the attendees file from Priscilla and modify `attendees_file` in the config file below. To add the PDF and video links where available, modify the above config file to have the values for `pdf_links` and `video_links` fields to be `true`. 
 
 ### Manual Tweaking
+
+Note that the Excel files produced by `generate.py` usually require some manual tweaking before they can be uploaded into the Whova EMS. Here are some known tweaks:
+
+1. The "Speakers" column (column H) in the "Agenda" sheet of the agenda Excel file need to be cleared of formatting before uploading. On macOS, this is done by selecting all of the cells in column H and then choose `Edit` -> `Clear` -> `Formats`.
+2. The "Email" columns in the agenda and attendees Excel files (column E in the "Speaker" sheet for the agenda file; column D in the attendees file) might contain invalid emails or might need to be cleared of formatting.
