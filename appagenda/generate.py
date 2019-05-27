@@ -624,7 +624,7 @@ def main():
     # sheet and look up their metadata
     logging.info("Classifying attendees into speakers and non-speakers ...")
     df_speakers, df_non_speakers = classify_attendees(agenda_rows,
-                                                      config['attendees_file'])
+                                                      attendees_file=config.get('attendees_file', None))
 
     # read in the Whova agenda template
     logging.info('Populating Whova agenda template ...')
