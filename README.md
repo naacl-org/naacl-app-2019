@@ -2,6 +2,10 @@
 
 This repsitory contains resources and scripts for the official Whova app for the 2019 Annual Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (NAACL-HLT).
 
+# Cloning
+
+Note that this repository uses submodules so to properly check out the submodule code, run `git submodule init` and `git submodule update` after you clone the repository. You will need the submodule to generate the schedule for the app.
+
 # Populating the App
 
 (**Note**: If you have any questions about the NAACL 2019 Whova app, [contact](mailto:first_initial_then_last_name_at_gmail_dot_com) Nitin Madnani, the conference app chair for NAACL 2019.)
