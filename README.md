@@ -52,14 +52,18 @@ Everything happens under the "Attendees" tab in the Whova EMS.
 For most events on Whova, a user needs to not only have a Whova account but that Whova account must explicitly be part of the attendees list for that event. In order for a user to become an attendee for an event, one of the following must be true:
 
 1. The email that they used to sign up for Whova must explicitly be on the pre-populated list of attendees if the app chair sets that up on the Whova EMS.
+
 2. They must know the secret access code for the event that only the app chair can see on the Whova EMS. 
+
 3. They request access to the event through the Whova app and their request is explicitly approved by the app chair via the Whova EMS.
 
 For NAACL 2019, we pre-populate the list of attendees by clicking on the "Import Attendees" button. This will provide an Excel template that can be populated using the information from Priscilla and uploaded to Whova. We get the spreadsheet of folks who have registered for the conference from Priscilla and then massage that spreadsheet into this Whova template.
 
 **Notes**: 
 - Some users might use a different email for conference registration and a different one for Whova, so option (3) is also likely to be quite popular among such users. 
+
 - Option (2) is not very secure since users might make that access code public or share with other attendees who aren't registered for the conference. 
+
 - The app chair might also need to add an attendee manually by clicking on the "Add Attendee" button in certain situations where it's just easier to add one or two records manually rather than uploading a whole spreadsheet again.
 
 Note that the massaging referred to above is done by the agenda generation script [`generate.py`](appagenda/generate.py). For more on this, refer to the next section.
@@ -73,4 +77,5 @@ The code and data for this lives under `appagenda`. For more details, refer to t
 Most of the content in this repository is under the MIT License _except_:
 
 - `images/header.jpg` - Original Photo by Daniel McCullough on Unsplash was uploaded under the [Unsplash License](https://unsplash.com/license).
+
 - `images/floormaps/*.png` - The floormaps are the property of Hyatt Regency and are extracted from the PDF of the floorplan provided to Priscilla as part of the signed contract. 
