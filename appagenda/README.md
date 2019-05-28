@@ -20,7 +20,7 @@ conda activate naacl2019
 
 The main file in this directory is `generate.py`. This is the main driver script that generates the spreadsheets for the agenda and attendees that can then be imported into the Whova Event Management System (EMS). This script uses the classes defined in the `orderfile.py` module from the NAACL 2019 schedule repository that is integrated as a submodule in this repository under the `agenda` directory. It takes as input a single JSON configuration file that contains the following fields:
     
-- `order_files` : A dictionary mapping the names for the events to the respective prder files. 
+- `order_files` : A dictionary mapping the names for the events to the respective order files. 
     
 - `mapping_files` : A dictionary with the event names as keys and the paths to the event's mapping files (mapping the anthology IDs to the START / order file IDs for the event) as the values.
         
@@ -40,7 +40,7 @@ The script `generate.py` also relies on two additional files that are assumed to
     
 - `Agenda_Track_Template.xlsx ` : This template file for the agenda and the speakers can be downloaded from the Whova EMS and is populated by `generate.py` to produce the first output file below.
     
-- `Attendee_list_template.xlsx` : This template file for attendees can also be downlaoded from teh Whova EMS and is populated by `generate.py` to produce the second output file below.
+- `Attendee_list_template.xlsx` : This template file for attendees can also be downloaded from the Whova EMS and is populated by `generate.py` to produce the second output file below.
 
 Both of these files are checked into the repository since they are empty and do not contain any actual information.
 
@@ -128,7 +128,7 @@ The configuration file `config.json` is checked into the repository and looks li
 }
 ```
 
-Note that the two output files are _not_ checked into the repository since it contains personal information for conference attendees. You will also need to get the attendees file from Priscilla and modify `attendees_file` in the config file below. To add the PDF and video links where available, modify the above config file to have the values for `pdf_links` and `video_links` fields to be `true`. 
+Note that the two output files are _not_ checked into the repository since it contains personal information for conference attendees. You will also need to get the attendees file from Priscilla and modify `attendees_file` in the configuration file below. To add the PDF and video links where available, modify the configuration file to have the values for `pdf_links` and `video_links` fields to be `true`. 
 
 ### Manual Tweaking
 

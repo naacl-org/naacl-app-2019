@@ -1,6 +1,6 @@
 # NAACL-HLT 2019 official app
 
-This repsitory contains resources and scripts for the official Whova app for the 2019 Annual Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (NAACL-HLT).
+This repository contains resources and scripts for the official Whova app for the 2019 Annual Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (NAACL-HLT).
 
 # Cloning
 
