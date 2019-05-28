@@ -643,6 +643,37 @@ def main():
     logging.info("Validating rows ...")
     invalid_rows = AppAgenda.validate_rows(agenda_rows)
 
+    # at this point we need to hardcode some workarounds for
+    # different people with the exact same names;
+
+    # WORKAROUNDS:
+    # (1) Paper "BERT Post-Training for Review Reading
+    #     Comprehension and Aspect-based Sentiment
+    #     Analysis": for this paper, "Bing Liu" from UIC
+    #     is an author but there's an entirely different
+    #     "Bing Liu" from Facebook AI who has registered
+    #     for the conference but if we do not explicitly
+    #     handle this case, Whova links the two so we need
+    #     to somehow make them appear different; so we just
+    #     add an asterisk to unregistered "Bing Liu" for now.
+    # 
+    # (2) Paper "A Soft Label Strategy for Target-Level Sentiment
+    #     Classification": for this paper, "Xiao Liu" from Peking
+    #     University is the author but another "Xiao Liu" from JHU
+    #     is registered for the conference. Again, we just add
+    #     an asterisk to the one from Peking University to
+    #     distinguish between the two.
+    for row in agenda_rows:
+        title = row[4]
+        if title == 'BERT Post-Training for Review Reading Comprehension and Aspect-based Sentiment Analysis':
+            speaker_string = row[-3]
+            new_speaker_string = speaker_string.replace('Bing Liu', "Bing Liu*")
+            row[-3] = new_speaker_string
+        elif title == 'A Soft Label Strategy for Target-Level Sentiment Classification':
+            speaker_string = row[-3]
+            new_speaker_string = speaker_string.replace('Xiao Liu', "Xiao Liu*")
+            row[-3] = new_speaker_string
+
     # match the speakers in the agenda in the attendees
     # sheet and look up their metadata
     logging.info("Classifying attendees into speakers and non-speakers ...")
