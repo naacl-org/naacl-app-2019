@@ -20,35 +20,35 @@ conda activate naacl2019
 
 The main file in this directory is `generate.py`. This is the main driver script that generates the spreadsheets for the agenda and attendees that can then be imported into the Whova Event Management System (EMS). This script uses the classes defined in the `orderfile.py` module from the NAACL 2019 schedule repository that is integrated as a submodule in this repository under the `agenda` directory. It takes as input a single JSON configuration file that contains the following fields:
     
-    - `order_files` : A dictionary mapping the names for the events to the respective prder files. 
+- `order_files` : A dictionary mapping the names for the events to the respective prder files. 
     
-    - `mapping_files` : A dictionary with the event names as keys and the paths to the event's mapping files (mapping the anthology IDs to the START / order file IDs for the event) as the values.
+- `mapping_files` : A dictionary with the event names as keys and the paths to the event's mapping files (mapping the anthology IDs to the START / order file IDs for the event) as the values.
         
-    - `extra_metadata_files` : A dictionary with the event names as keys and the paths non-anthology metadata TSV files for the event as values.  These files contain the title, authors, and abstracts for the event items that are not in the anthology (e.g., TACL papers, non-archival workshop papers, etc.)
+- `extra_metadata_files` : A dictionary with the event names as keys and the paths non-anthology metadata TSV files for the event as values.  These files contain the title, authors, and abstracts for the event items that are not in the anthology (e.g., TACL papers, non-archival workshop papers, etc.)
     
-    - `xml_files` : List of all XML files from the Anthology containing the titles, authors, abstracts, and anthology URLs for all of the items across all of the events
+- `xml_files` : List of all XML files from the Anthology containing the titles, authors, abstracts, and anthology URLs for all of the items across all of the events
 
-    - `plenary_info_file` : Another optional TSV file containing additional info about some of the plenary sessions (e.g., keynote abstracts etc.)
+- `plenary_info_file` : Another optional TSV file containing additional info about some of the plenary sessions (e.g., keynote abstracts etc.)
     
-    - `attendees_file` : An optional Excel file containing information about folks who are registered for the conference. This file is generally provided by Priscilla. This file is not available in the repository since it contains personal information about the conference attendees.
+- `attendees_file` : An optional Excel file containing information about folks who are registered for the conference. This file is generally provided by Priscilla. This file is not available in the repository since it contains personal information about the conference attendees.
     
-    - `pdf_links` : A boolean indicating whether to generate links in the agenda to anthology PDFs or PDFs specified in the extra metadata files.
+- `pdf_links` : A boolean indicating whether to generate links in the agenda to anthology PDFs or PDFs specified in the extra metadata files.
     
-    - `video_links` : A boolean indicating whether to generate links in the schedule to the talk videos hosted on Vimeo/YouTube or other video platforms.
+- `video_links` : A boolean indicating whether to generate links in the schedule to the talk videos hosted on Vimeo/YouTube or other video platforms.
 
 The script `generate.py` also relies on two additional files that are assumed to be there in the `appagenda` diretory but aren't explicitly specified as inputs:
     
-    - `Agenda_Track_Template.xlsx ` : This template file for the agenda and the speakers can be downloaded from the Whova EMS and is populated by `generate.py` to produce the first output file below.
+- `Agenda_Track_Template.xlsx ` : This template file for the agenda and the speakers can be downloaded from the Whova EMS and is populated by `generate.py` to produce the first output file below.
     
-    - `Attendee_list_template.xlsx` : This template file for attendees can also be downlaoded from teh Whova EMS and is populated by `generate.py` to produce the second output file below.
+- `Attendee_list_template.xlsx` : This template file for attendees can also be downlaoded from teh Whova EMS and is populated by `generate.py` to produce the second output file below.
 
 Both of these files are checked into the repository since they are empty and do not contain any actual information.
 
 As output, `generate.py` produces two files:
     
-    1. The first is an Excel files containing the detailed agenda and speakers for NAACL 2019 - across the main conference and all workshops. This Excel file contains two main sheets called "Agenda" and "Speaker". The "Agenda" sheet contains the schedule information including dates, start times, end times, session titles, abstracts, names of authors/speakers etc. The "Speaker" sheet contains the names, emails, and affiliations of all of the people who are authors and co-authors on any papers across the main conference and workshops. 
+1. The first is an Excel files containing the detailed agenda and speakers for NAACL 2019 - across the main conference and all workshops. This Excel file contains two main sheets called "Agenda" and "Speaker". The "Agenda" sheet contains the schedule information including dates, start times, end times, session titles, abstracts, names of authors/speakers etc. The "Speaker" sheet contains the names, emails, and affiliations of all of the people who are authors and co-authors on any papers across the main conference and workshops. 
    
-    2. The second output file is also an Excel file and contains names, emails, and affiliations for non-speaker attendees in a single sheet called "Sheet1". That is, folks who are registered for the conference but aren't authors or co-authors on any papers. 
+2. The second output file is also an Excel file and contains names, emails, and affiliations for non-speaker attendees in a single sheet called "Sheet1". That is, folks who are registered for the conference but aren't authors or co-authors on any papers. 
 
 The script `generate.py` also relies on some utility functions that are defined in `utils.py`. For more details on these two scripts, please refer to the code and the comments in the scripts.
 
