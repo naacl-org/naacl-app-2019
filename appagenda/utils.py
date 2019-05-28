@@ -159,11 +159,13 @@ def classify_attendees(agenda_rows, attendees_file=None):
         not speakers but are still registered for
         the conference.
     """
-    # first get all of the speakers in the agenda
+    # get all of the speakers in the agenda
     speakers = set()
     for row in agenda_rows:
         speaker_string = row[-3]
-        speakers.update(speaker_string.split('; '))
+        if speaker_string:
+            for speaker in speaker_string.split('; '):
+                speakers.add(speaker)
 
     # if we are given an attendees file then
     # read that file into a data frame
