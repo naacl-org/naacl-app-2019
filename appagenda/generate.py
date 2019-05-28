@@ -329,6 +329,9 @@ class AppSession(Session):
         description = ''
         authors = ''
 
+        # initialize title to be the session title
+        title = self.title
+
         # get the tracks for this session
         tracks = get_tracks_for_session(self, event)
 
@@ -355,6 +358,19 @@ class AppSession(Session):
             # for these sessions, the description is just
             # the name of the session chair
             description = '<p>Chair: {}</p>'.format(self.chair) if self.chair else ''
+
+            # include the ID in the title if available
+            # but only for the main conference
+            if event == 'main' and self.id_:
+                title = '{}: {}'.format(self.id_, title)
+
+            # TODO: add session livetweeters if available
+
+        # we also want to include the ID in titles
+        # for poster sessions in the main conference
+        elif self.type == 'poster' and event == 'main' and self.id_:
+            title = '{}: {}'.format(self.id_, title)
+
         # next use the extra plenary info provided, if appropriate
         elif self.type == 'plenary':
             self.abstract = ''
@@ -394,7 +410,7 @@ class AppSession(Session):
                                    self.start,
                                    self.end,
                                    tracks,
-                                   self.title,
+                                   title,
                                    self.location,
                                    description,
                                    authors,
