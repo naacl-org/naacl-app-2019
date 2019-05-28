@@ -597,23 +597,29 @@ def main():
     # break sessions on June 6th and 7th; we removed them
     # from the workshop order files since it was leading to
     # Whova complain about duplicate rows
+    agenda_rows.append(['06/06/2019', '7:30', '9:00', '',
+                        'Breakfast', 'Hyatt Exhibit Hall & Nicollet Promenade',
+                        '', '', '', 'Session'])
     agenda_rows.append(['06/06/2019', '10:30', '11:00', '',
-                        'Morning coffee break', 'Hyatt Exhibit Hall',
+                        'Morning coffee break', 'Hyatt Exhibit Hall & Nicollet Promenade',
                         '', '', '', 'Session'])
     agenda_rows.append(['06/06/2019', '12:30', '14:00', '',
                         'Lunch on your own', '',
                         '', '', '', 'Session'])
     agenda_rows.append(['06/06/2019', '15:30', '16:00', '',
-                        'Afternoon coffee break', 'Hyatt Exhibit Hall',
+                        'Afternoon coffee break', 'Hyatt Exhibit Hall & Nicollet Promenade',
+                        '', '', '', 'Session'])
+    agenda_rows.append(['06/07/2019', '7:30', '9:00', '',
+                        'Breakfast', 'Hyatt Exhibit Hall & Nicollet Promenade',
                         '', '', '', 'Session'])
     agenda_rows.append(['06/07/2019', '10:30', '11:00', '',
-                        'Morning coffee break', 'Hyatt Exhibit Hall',
+                        'Morning coffee break', 'Hyatt Exhibit Hall & Nicollet Promenade',
                         '', '', '', 'Session'])
     agenda_rows.append(['06/07/2019', '12:30', '14:00', '',
                         'Lunch on your own', '',
                         '', '', '', 'Session'])
     agenda_rows.append(['06/07/2019', '15:30', '16:00', '',
-                        'Afternoon coffee break', 'Hyatt Exhibit Hall',
+                        'Afternoon coffee break', 'Hyatt Exhibit Hall & Nicollet Promenade',
                         '', '', '', 'Session'])
 
     # validate the rows and get the indices for the rows
