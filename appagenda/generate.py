@@ -355,16 +355,18 @@ class AppSession(Session):
                 self.start = self.items[0].start
                 self.end = self.items[-1].end
 
-            # for these sessions, the description is just
-            # the name of the session chair
+            # for these sessions, the description contains
+            # the name of the session chair if available
             description = '<p>Chair: {}</p>'.format(self.chair) if self.chair else ''
+
+            # it can also contain the livetweeter info if that was available
+            if 'tweeter' in self.extended_metadata:
+                description += '<p>LiveTweeter: <a href="https://twitter.com/{}">{}</a></p>'.format(self.extended_metadata['tweeterid'], self.extended_metadata['tweeter'])
 
             # include the ID in the title if available
             # but only for the main conference
             if event == 'main' and self.id_:
                 title = '{}: {}'.format(self.id_, title)
-
-            # TODO: add session livetweeters if available
 
         # we also want to include the ID in titles
         # for poster sessions in the main conference
