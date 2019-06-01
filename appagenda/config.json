@@ -49,6 +49,7 @@
         "main": "agenda/data/extra-metadata/main.tsv",
         "NeuralGen": "agenda/data/extra-metadata/neuralgen.tsv",
         "NLLP": "agenda/data/extra-metadata/nllp.tsv",
+        "SPNLP": "agenda/data/extra-metadata/spnlp.tsv",
         "WNU": "agenda/data/extra-metadata/wnu.tsv"
     },
     "xml_files": [
