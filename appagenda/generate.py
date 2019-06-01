@@ -666,13 +666,21 @@ def main():
     #     handle this case, Whova links the two so we need
     #     to somehow make them appear different; so we just
     #     add an asterisk to unregistered "Bing Liu" for now.
-    # 
+    #
     # (2) Paper "A Soft Label Strategy for Target-Level Sentiment
     #     Classification": for this paper, "Xiao Liu" from Peking
     #     University is the author but another "Xiao Liu" from JHU
     #     is registered for the conference. Again, we just add
     #     an asterisk to the one from Peking University to
     #     distinguish between the two.
+    #
+    # (3) For the paper titles "Beyond The Wall
+    # Street Journal: Anchoring and Comparing Discourse Signals
+    # across Genres" and "A Discourse Signal Annotation System
+    # for RST Trees" and "GumDrop at the DISRPT2019 Shared Task:
+    # A Model Stacking Approach to Discourse Unit Segmentation
+    # and Connective Detection", the author  "Yang Liu" from
+    # Georgetown gets renamed to "Yang (Janet) Liu".
     for row in agenda_rows:
         title = row[4]
         if title == 'BERT Post-Training for Review Reading Comprehension and Aspect-based Sentiment Analysis':
@@ -682,6 +690,18 @@ def main():
         elif title == 'A Soft Label Strategy for Target-Level Sentiment Classification':
             speaker_string = row[-3]
             new_speaker_string = speaker_string.replace('Xiao Liu', "Xiao Liu*")
+            row[-3] = new_speaker_string
+        elif title == "Beyond The Wall Street Journal: Anchoring and Comparing Discourse Signals across Genres":
+            speaker_string = row[-3]
+            new_speaker_string = speaker_string.replace('Yang Liu', "Yang (Janet) Liu")
+            row[-3] = new_speaker_string
+        elif title == "A Discourse Signal Annotation System for RST Trees":
+            speaker_string = row[-3]
+            new_speaker_string = speaker_string.replace('Yang Liu', "Yang (Janet) Liu")
+            row[-3] = new_speaker_string
+        elif title == "GumDrop at the DISRPT2019 Shared Task: A Model Stacking Approach to Discourse Unit Segmentation and Connective Detection":
+            speaker_string = row[-3]
+            new_speaker_string = speaker_string.replace('Yang Liu', "Yang (Janet) Liu")
             row[-3] = new_speaker_string
 
     # match the speakers in the agenda in the attendees
