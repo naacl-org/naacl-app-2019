@@ -503,6 +503,14 @@ class AppItem(Item):
         self.pdf_url = item_metadata.pdf_url
         self.video_url = item_metadata.video_url
 
+        # add the poster number to the title if we have a
+        # poster and the poster number is available in the
+        # extended metadata - do this only for the main track!
+        if event == 'main' and self.type == 'poster':
+            if 'poster_number' in self.extended_metadata:
+                poster_number = self.extended_metadata['poster_number']
+                self.title = '#{}: {}'.format(poster_number, self.title)
+
         # set the description to be the abstract
         description = '<p>{}</p>'.format(item_metadata.abstract)
 
