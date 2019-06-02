@@ -59,6 +59,6 @@
     ],
     "plenary_info_file": "agenda/data/plenary-info.tsv",
     "attendees_file": "appagenda/2019-NAACL-Registrations-for-App-May20.xlsx",
-    "pdf_links": false,
+    "pdf_links": true,
     "video_links": false
 }
