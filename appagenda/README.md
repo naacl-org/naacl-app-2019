@@ -114,6 +114,7 @@ The configuration file `config.json` is checked into the repository and looks li
         "main": "agenda/data/extra-metadata/main.tsv",
         "NeuralGen": "agenda/data/extra-metadata/neuralgen.tsv",
         "NLLP": "agenda/data/extra-metadata/nllp.tsv",
+        "SPNLP": "agenda/data/extra-metadata/spnlp.tsv",
         "WNU": "agenda/data/extra-metadata/wnu.tsv"
     },
     "xml_files": [
@@ -123,12 +124,12 @@ The configuration file `config.json` is checked into the repository and looks li
     ],
     "plenary_info_file": "agenda/data/plenary-info.tsv",
     "attendees_file": "appagenda/2019-NAACL-Registrations-for-App-May20.xlsx",
-    "pdf_links": false,
+    "pdf_links": true,
     "video_links": false
 }
 ```
 
-Note that the two output files are _not_ checked into the repository since it contains personal information for conference attendees. You will also need to get the attendees file from Priscilla and modify `attendees_file` in the configuration file below. To add the PDF and video links where available, modify the configuration file to have the values for `pdf_links` and `video_links` fields to be `true`. 
+Note that the two output files are _not_ checked into the repository since it contains personal information for conference attendees. You will also need to get the attendees file from Priscilla and modify `attendees_file` in the configuration file below. This config file adds PDF links where available but not video ones. To add the video links where available, modify the configuration file and set the value for `video_links` field to be `true`. 
 
 ### Manual Tweaking
 
